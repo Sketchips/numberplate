@@ -1,6 +1,6 @@
 # Number Plate Detection
 
-Sistem **Number Plate Detection** merupakan aplikasi berbasis **Python** yang digunakan untuk mendeteksi dan mengenali plat nomor kendaraan dari gambar maupun video menggunakan teknologi **Computer Vision**.
+Sistem **Number Plate Detection** merupakan aplikasi berbasis **Python** yang digunakan untuk mendeteksi dan mengenali plat nomor kendaraan dari gambar maupun video menggunakan teknologi **OpenCV dan OCR**.
 
 ## Fitur
 
@@ -63,9 +63,7 @@ python number_plate.py
 
 * Python
 * OpenCV
-* NumPy
-* EasyOCR / Tesseract OCR *(sesuaikan dengan proyek Anda)*
-* Computer Vision
+* OCR
 
 ---
 
