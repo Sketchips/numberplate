@@ -1,22 +1,71 @@
-# Deteksi Plat Nomor (Number Plate Detection)
+# Number Plate Detection
 
-Proyek ini digunakan untuk mendeteksi dan mengenali plat nomor kendaraan menggunakan Python.
+Sistem **Number Plate Detection** merupakan aplikasi berbasis **Python** yang digunakan untuk mendeteksi dan mengenali plat nomor kendaraan dari gambar maupun video menggunakan teknologi **Computer Vision**.
+
+## Fitur
+
+* 🔍 Deteksi lokasi plat nomor kendaraan
+* 📝 Pengenalan karakter pada plat nomor (OCR)
+* ⚡ Proses deteksi secara otomatis
+* 🐍 Dibangun menggunakan Python
+
+---
 
 ## Prasyarat
-Sebelum memulai, pastikan Anda sudah menginstal **Python (versi 3.8 atau yang lebih baru)** dan **Git** di komputer Anda.
 
-## Langkah Instalasi dan Penggunaan
-**Clone Repositori**
-   ```bash
-   git clone [https://github.com/username/nama-repo.git](https://github.com/username/nama-repo.git)
-   cd nama-repo
+Pastikan perangkat Anda telah menginstal:
 
-**Instal Dependencies**
+* Python **3** atau lebih baru
+* Git
 
-Bash
+Anda dapat mengecek versi yang terpasang dengan perintah berikut:
+
+```bash
+python --version
+git --version
+```
+
+---
+
+## 🚀 Instalasi
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/username/nama-repo.git
+cd nama-repo
+```
+
+### 2. Install Dependencies
+
+Install seluruh dependency:
+
+```bash
 pip install -r requirements.txt
+```
 
-**Jalankan Program**
+---
 
-Bash
+## ▶️ Menjalankan Program
+
+Jalankan aplikasi menggunakan perintah berikut:
+
+```bash
 python number_plate.py
+```
+
+---
+
+
+---
+
+## 🛠️ Teknologi yang Digunakan
+
+* Python
+* OpenCV
+* NumPy
+* EasyOCR / Tesseract OCR *(sesuaikan dengan proyek Anda)*
+* Computer Vision
+
+---
+
