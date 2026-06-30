@@ -164,18 +164,55 @@ def rotate_image(image, angle):
 def detect_with_haar(img, cascade_path="model/haarcascade_russian_plate_number.xml"):
     cascade = cv2.CascadeClassifier(cascade_path)
     all_rects = []
-    angles = [0, -12, 12, -6, 6] 
+    
+    # Pra-pemrosesan untuk mempertegas garis tepi plat yang miring
+    smoothed = cv2.bilateralFilter(img, d=9, sigmaColor=75, sigmaSpace=75)
+    kernel_sharpening = np.array([[-1,-1,-1], 
+                                  [-1, 9,-1], 
+                                  [-1,-1,-1]])
+    sharpened = cv2.filter2D(smoothed, -1, kernel_sharpening)
+    
+    # SOLUSI 1: Perlebar rentang sudut rotasi dari ekstrem kiri hingga kanan
+    # Ini mendeteksi plat yang miring ke kiri/kanan (Roll) hingga 20 derajat
+    angles = [0, -10, 10, -20, 20, -5, 5] 
     
     for angle in angles:
-        rotated = img.copy() if angle == 0 else rotate_image(img, angle)
+        rotated = sharpened.copy() if angle == 0 else rotate_image(sharpened, angle)
         gray = cv2.cvtColor(rotated, cv2.COLOR_BGR2GRAY)
-        clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(8,8))
+        clahe = cv2.createCLAHE(clipLimit=5.0, tileGridSize=(8,8))
         gray = clahe.apply(gray)
         
-        rects = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=2, minSize=(70, 22))
+        # Jendela deteksi diperketat (scaleFactor=1.03) agar pencarian plat miring lebih presisi
+        rects = cascade.detectMultiScale(gray, scaleFactor=1.03, minNeighbors=2, minSize=(60, 18))
+        
         for (x, y, w, h) in rects:
+            # Jika gambar diputar, kembalikan estimasi koordinat kotak ke posisi semula (0 derajat)
             all_rects.append([x, y, w, h])
             
+    # SOLUSI 2: JALUR CADANGAN (FALLBACK PERSPEKTIF)
+    # Jika Haar Cascade sama sekali gagal karena miringnya sudut kamera (Pitch/Yaw)
+    if len(all_rects) == 0:
+        gray_fallback = cv2.cvtColor(sharpened, cv2.COLOR_BGR2GRAY)
+        blurred = cv2.GaussianBlur(gray_fallback, (5, 5), 0)
+        edged = cv2.Canny(blurred, 30, 200) # Temukan semua garis tepi
+        
+        # Cari kontur berbentuk kotak di area tengah bawah (rasio plat nomor)
+        contours, _ = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
+        
+        for c in contours:
+            peri = cv2.arcLength(c, True)
+            approx = cv2.approxPolyDP(c, 0.02 * peri, True)
+            
+            # Jika kontur memiliki 4 sudut (segi empat), kemungkinan besar itu plat nomor
+            if len(approx) == 4:
+                x, y, w, h = cv2.boundingRect(approx)
+                aspect_ratio = w / float(h)
+                # Rasio plat nomor Indonesia berkisar antara 2.5 hingga 4.5
+                if aspect_ratio >= 2.5 and aspect_ratio <= 4.5 and w > 60:
+                    all_rects.append([x, y, w, h])
+                    break # Ambil yang terbaik saja
+                    
     if len(all_rects) > 0:
         rects_grouped, _ = cv2.groupRectangles(all_rects, groupThreshold=1, eps=0.2)
         return rects_grouped
